@@ -11,7 +11,9 @@ import zz.black.community.community.mapper.UserMapper;
 import zz.black.community.community.model.User;
 import zz.black.community.community.provider.GithubProvider;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 /**
@@ -38,7 +40,7 @@ public class AuthorizeController {
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state") String state,
-                           HttpServletRequest request)
+                           HttpServletResponse response)
             //通过 @requestparam 获取传回的参数
     {
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
@@ -54,13 +56,17 @@ public class AuthorizeController {
         //登陆成功，写 cookie 和 session
         {
             User user = new User();
-            user.setToken(UUID.randomUUID().toString());
+            String token = UUID.randomUUID().toString();
+
+            user.setToken(token);
             user.setName(githubuser.getName());
             user.setAccountId(String.valueOf(githubuser.getId()));
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
             userMapper.insert(user);
-            request.getSession().setAttribute("user", githubuser);
+
+            response.addCookie(new Cookie("token", token));
+
             return "redirect:/";
         }
         else
