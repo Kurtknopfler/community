@@ -7,7 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import zz.black.community.community.dto.AccessTokenDTO;
 import zz.black.community.community.dto.GithubUser;
+import zz.black.community.community.mapper.UserMapper;
+import zz.black.community.community.model.User;
 import zz.black.community.community.provider.GithubProvider;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.UUID;
 
 /**
  *
@@ -27,9 +32,13 @@ public class AuthorizeController {
     @Value("${github.redirect.uri}")
     private String reDirectUri;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
-                           @RequestParam(name = "state") String state)
+                           @RequestParam(name = "state") String state,
+                           HttpServletRequest request)
             //通过 @requestparam 获取传回的参数
     {
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
@@ -39,9 +48,27 @@ public class AuthorizeController {
         accessTokenDTO.setClient_id(clientId);
         accessTokenDTO.setClient_secret(clientSecret);
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
-        GithubUser user = githubProvider.getUser(accessToken);
-        System.out.println(user.getName());
+        GithubUser githubuser = githubProvider.getUser(accessToken);
 
-        return "index";
+        if(githubuser != null)
+        //登陆成功，写 cookie 和 session
+        {
+            User user = new User();
+            user.setToken(UUID.randomUUID().toString());
+            user.setName(githubuser.getName());
+            user.setAccountId(String.valueOf(githubuser.getId()));
+            user.setGmtCreate(System.currentTimeMillis());
+            user.setGmtModified(user.getGmtCreate());
+            userMapper.insert(user);
+            request.getSession().setAttribute("user", githubuser);
+            return "redirect:/";
+        }
+        else
+        {
+            return "redirect:/";
+        }
+//        System.out.println(user.getName());
+
+//        return "index";
     }
 }
