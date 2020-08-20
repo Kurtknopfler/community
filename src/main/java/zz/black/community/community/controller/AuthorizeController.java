@@ -12,7 +12,6 @@ import zz.black.community.community.model.User;
 import zz.black.community.community.provider.GithubProvider;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
