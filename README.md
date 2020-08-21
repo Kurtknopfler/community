@@ -13,6 +13,7 @@
 
 [Gihub OAuth](https://docs.github.com/en/developers/apps/creating-an-oauth-app)
 
+[Thymeleaf](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
 ## 工具
 [Git](https://git-scm.com/downloads)
 
