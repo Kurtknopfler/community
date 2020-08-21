@@ -20,6 +20,8 @@
 
 [flyway](https://flywaydb.org/getstarted/firststeps/maven)
 
+[lombok](https://projectlombok.org/setup/maven)
+
 ## 脚本
 ```sql
 CREATE TABLE USER
